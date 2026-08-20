@@ -31,7 +31,7 @@ export default function Home() {
 
   async function handleGoogleSignIn() {
     setIsSigningIn(true);
-    await signIn.social({ provider: "google", callbackURL: "/" });
+    await signIn.social({ provider: "google", callbackURL: "/dashboard" });
     setIsSigningIn(false);
   }
 

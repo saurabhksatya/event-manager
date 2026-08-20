@@ -22,6 +22,12 @@ model User {
   updatedAt     DateTime  @db.Timestamptz(3)
   sessions      Session[]
   accounts      Account[]
+  role          String?
+  banned        Boolean?
+  banReason     String?
+  banExpires    DateTime? @db.Timestamptz(3)
+
+  participantEvents Event[] @relation("EventParticipants")
 
   @@map("user")
 }
@@ -69,4 +75,17 @@ model Verification {
   updatedAt  DateTime @db.Timestamptz(3)
 
   @@map("verification")
+}
+
+model Event {
+  id           String   @id
+  title        String
+  description  String?
+  date         DateTime @db.Timestamptz(3)
+  location     String?
+  createdAt    DateTime @db.Timestamptz(3)
+  updatedAt    DateTime @db.Timestamptz(3)
+  participants User[]   @relation("EventParticipants")
+
+  @@map("event")
 }
