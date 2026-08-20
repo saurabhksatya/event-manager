@@ -5,7 +5,11 @@ import { signIn } from "@/lib/auth-client";
 
 function GoogleIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="w-5 h-5 flex-shrink-0"
+    >
       <path
         fill="#4285F4"
         d="M21.35 12.27c0-.71-.06-1.4-.18-2.06H12v3.9h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.15c1.85-1.7 2.9-4.2 2.9-7.23Z"
@@ -36,42 +40,37 @@ export default function Home() {
   }
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f5f7f2] px-6 py-12 text-[#17251f]">
-      <div className="pointer-events-none absolute -left-32 -top-32 size-96 rounded-full bg-[#d9e9d8] opacity-70 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-48 -right-24 size-[32rem] rounded-full bg-[#f4d9bd] opacity-60 blur-3xl" />
+    <main className="min-h-screen bg-[#f6f8fc] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Ambient background blobs */}
+      <div className="fixed -top-1/4 -left-1/4 w-[50vw] h-[50vw] bg-radial from-indigo-500/15 to-transparent rounded-full pointer-events-none" />
+      <div className="fixed -bottom-1/4 -right-1/4 w-[60vw] h-[60vw] bg-radial from-emerald-500/10 to-transparent rounded-full pointer-events-none" />
 
-      <section className="relative w-full max-w-md rounded-[2rem] border border-[#d9e1d9] bg-white/90 p-8 shadow-[0_24px_80px_rgba(35,57,45,0.12)] backdrop-blur sm:p-10">
-        <p className="text-[15px] leading-7 text-[#66756d]">
-          Sign in to discover events, manage registrations, and stay connected
-          with campus life.
-        </p>
+      {/* Hero */}
+      <div className="animate-fade-up text-center max-w-lg mb-16 relative w-full">
+        {/* Sign In Card */}
+        <div className="bg-white/90 backdrop-blur-2xl border border-indigo-200/50 rounded-3xl p-8 max-w-sm mx-auto shadow-xl shadow-indigo-500/10">
+          <div className="text-sm text-slate-600 mb-6 font-medium">
+            Sign in with your VIT student account to get started.
+          </div>
 
-        <button
-          type="button"
-          onClick={handleGoogleSignIn}
-          disabled={isSigningIn}
-          className="mt-9 flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-[#cfd8d1] bg-white text-sm font-semibold text-[#26352d] shadow-sm transition hover:border-[#1f5b45] hover:bg-[#f8fbf8] focus:outline-none focus:ring-4 focus:ring-[#1f5b45]/15 disabled:cursor-wait disabled:opacity-60"
-        >
-          <GoogleIcon />
-          {isSigningIn ? "Redirecting..." : "Continue with Google"}
-        </button>
+          <button
+            id="google-sign-in-btn"
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isSigningIn}
+            className="w-full inline-flex items-center justify-center gap-3 px-6 py-3.5 text-base font-semibold text-slate-700 bg-white border border-indigo-200 hover:bg-slate-50 hover:text-slate-900 active:scale-[0.98] rounded-xl transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <GoogleIcon />
+            {isSigningIn ? "Redirecting..." : "Continue with Google"}
+          </button>
 
-        <div className="mt-7 flex gap-3 rounded-xl bg-[#f3f6f1] p-4 text-xs leading-5 text-[#617068]">
-          <span className="mt-0.5 text-base text-[#1f5b45]">i</span>
-          <p>
-            Access is limited to VIT students. Only Google accounts ending in
-            <strong className="font-semibold text-[#344d40]">
-              {" "}
-              @vitstudent.ac.in
-            </strong>{" "}
-            are allowed.
-          </p>
+          <div className="mt-5 p-3 bg-indigo-50/80 border border-indigo-100 rounded-xl text-xs text-slate-500 flex items-start gap-2 text-left">
+            <span>
+              Only <strong className="text-slate-700 font-semibold">@vitstudent.ac.in</strong> accounts are permitted.
+            </span>
+          </div>
         </div>
-
-        <p className="mt-8 text-center text-xs text-[#8a968f]">
-          By continuing, you agree to use your official VIT student account.
-        </p>
-      </section>
+      </div>
     </main>
   );
 }

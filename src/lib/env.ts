@@ -12,6 +12,7 @@ const env = {
   BETTER_AUTH_URL: assertEnvVariable("BETTER_AUTH_URL"),
   GOOGLE_CLIENT_ID: assertEnvVariable("GOOGLE_CLIENT_ID"),
   GOOGLE_CLIENT_SECRET: assertEnvVariable("GOOGLE_CLIENT_SECRET"),
+  GEMINI_API_KEY: assertEnvVariable("GEMINI_API_KEY"),
 };
 
 export default env;

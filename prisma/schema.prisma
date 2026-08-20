@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -27,7 +25,8 @@ model User {
   banReason     String?
   banExpires    DateTime? @db.Timestamptz(3)
 
-  participantEvents Event[] @relation("EventParticipants")
+  organizedEvents Event[]        @relation("EventOrganizer")
+  registrations   Registration[]
 
   @@map("user")
 }
@@ -78,14 +77,48 @@ model Verification {
 }
 
 model Event {
-  id           String   @id
-  title        String
-  description  String?
-  date         DateTime @db.Timestamptz(3)
-  location     String?
-  createdAt    DateTime @db.Timestamptz(3)
-  updatedAt    DateTime @db.Timestamptz(3)
-  participants User[]   @relation("EventParticipants")
+  id                 String   @id @default(cuid())
+  title              String
+  description        String?
+  date               DateTime @db.Timestamptz(3)
+  location           String?
+  registeredCount    Int      @default(0)
+  isRegistrationOpen Boolean  @default(true)
+  isActive           Boolean  @default(true)
+  organizerId        String
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(3)
+
+  organizer     User           @relation("EventOrganizer", fields: [organizerId], references: [id])
+  registrations Registration[]
 
   @@map("event")
+}
+
+model Registration {
+  id               String   @id @default(cuid())
+  eventId          String
+  userId           String
+  qrToken          String   @unique @default(cuid())
+  qrTokenExpiresAt DateTime @db.Timestamptz(3)
+  registeredAt     DateTime @default(now()) @db.Timestamptz(3)
+
+  event   Event    @relation(fields: [eventId], references: [id])
+  user    User     @relation(fields: [userId], references: [id])
+  checkIn CheckIn?
+
+  // One registration per user per event
+  @@unique([eventId, userId])
+  @@map("registration")
+}
+
+model CheckIn {
+  id             String   @id @default(cuid())
+  registrationId String   @unique // ← THE duplicate guard — DB-level
+  checkedInAt    DateTime @default(now()) @db.Timestamptz(3)
+  stationId      String? // optional: identifies which scanner station
+
+  registration Registration @relation(fields: [registrationId], references: [id])
+
+  @@map("check_in")
 }
