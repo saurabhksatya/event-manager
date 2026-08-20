@@ -1,27 +1,3 @@
-/**
- * POST /api/events/[id]/checkin
- *
- * Scans a QR token and checks the attendee in.
- *
- * Duplicate prevention strategy (Hard Req #1):
- *   - CheckIn table has UNIQUE constraint on registrationId (enforced in DB).
- *   - We SELECT the registration FOR UPDATE inside a transaction (row lock).
- *   - We check if a CheckIn already exists BEFORE inserting.
- *   - Even if two servers race past the check simultaneously, the UNIQUE
- *     constraint ensures only one INSERT succeeds; the other gets a DB error
- *     that we catch and return as a 409 with the timestamp from the first check-in.
- *
- * QR security (Hard Req #2):
- *   - Token must not be expired (5-minute TTL).
- *   - On each successful check-in, we also note the scan is consumed.
- *     A new token is not automatically issued — the attendee would need to
- *     be re-registered, making screenshot reuse after expiry impossible.
- *
- * Offline support (Hard Req #3):
- *   - Offline scans send offlineScannedAt in body.
- *   - We accept them on reconnect and apply the same duplicate logic.
- */
-
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -55,7 +31,6 @@ export async function POST(
 
   try {
     const checkIn = await prisma.$transaction(async (tx) => {
-      // Find registration by QR token, locking the row
       const registrations = await tx.$queryRaw<
         {
           id: string;
@@ -132,7 +107,7 @@ export async function POST(
         { status: 410 },
       );
     if (msg.startsWith("ALREADY_CHECKED_IN:")) {
-      const time = msg.split(":")[1];
+      const time = msg.slice("ALREADY_CHECKED_IN:".length);
       return NextResponse.json(
         { error: `Already checked in at ${time}` },
         { status: 409 },

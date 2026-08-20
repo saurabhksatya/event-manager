@@ -138,7 +138,6 @@ export default function AttendeeEventsPage() {
                       })}
                     </span>
                     {ev.location && <span>📍 {ev.location}</span>}
-                    <span>👤 By {ev.organizer.name}</span>
                   </div>
                 </div>
 
@@ -163,8 +162,8 @@ export default function AttendeeEventsPage() {
                     registered
                       ? "bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed"
                       : !canRegister
-                      ? "bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed"
-                      : "bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white shadow-sm shadow-indigo-600/30"
+                        ? "bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed"
+                        : "bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] text-white shadow-sm shadow-indigo-600/30"
                   }`}
                 >
                   {registering === ev.id ? (

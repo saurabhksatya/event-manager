@@ -8,9 +8,7 @@ interface AIInsightsProps {
 
 const EXAMPLE_QUESTIONS = [
   "How many people have checked in so far?",
-  "What percentage of registered attendees are no-shows?",
   "What time did check-ins peak?",
-  "How many spots are left?",
 ];
 
 export default function AIInsights({ eventId }: AIInsightsProps) {

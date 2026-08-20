@@ -8,6 +8,7 @@ import {
   syncOfflineScans,
   getPendingScans,
   type SyncResult,
+  type OfflineScan,
 } from "@/lib/offline-store";
 
 type ScanStatus =
@@ -38,6 +39,7 @@ export default function ScanPage({
   const [status, setStatus] = useState<ScanStatus>({ kind: "idle" });
   const [online, setOnline] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingList, setPendingList] = useState<OfflineScan[]>([]);
   const [syncResults, setSyncResults] = useState<SyncResult[]>([]);
   const [syncing, setSyncing] = useState(false);
   const [scanning, setScanning] = useState(true);
@@ -58,7 +60,9 @@ export default function ScanPage({
 
   const refreshPending = useCallback(async () => {
     const pending = await getPendingScans();
-    setPendingCount(pending.filter((s) => s.eventId === eventId).length);
+    const eventPending = pending.filter((s) => s.eventId === eventId);
+    setPendingCount(eventPending.length);
+    setPendingList(eventPending);
   }, [eventId]);
 
   useEffect(() => {
@@ -189,8 +193,8 @@ export default function ScanPage({
       text: "QR code expired — attendee must refresh their ticket",
     },
     "offline-queued": {
-      container: "bg-indigo-50 border-indigo-200 text-indigo-700",
-      text: "Scan saved offline — will sync when connected",
+      container: "bg-amber-50 border-amber-300 text-amber-800",
+      text: "Scan saved offline — Pending sync when connected",
     },
   };
 
@@ -202,7 +206,7 @@ export default function ScanPage({
         <div className="flex items-center gap-2 mb-1.5">
           <Link
             href={`/organizer/events/${eventId}`}
-            className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+            className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors inline-flex items-center gap-1"
           >
             ← Dashboard
           </Link>
@@ -215,8 +219,9 @@ export default function ScanPage({
         <div className="flex items-center gap-2.5 flex-wrap text-xs text-slate-500">
           <div className="flex items-center gap-1.5 font-semibold">
             <span
-              className={`w-2 h-2 rounded-full animate-pulse ${online ? "bg-emerald-500" : "bg-red-500"
-                }`}
+              className={`w-2 h-2 rounded-full animate-pulse ${
+                online ? "bg-emerald-500" : "bg-red-500"
+              }`}
             />
             <span className={online ? "text-emerald-600" : "text-red-600"}>
               {online ? "Online" : "Offline — scans will queue"}
@@ -229,7 +234,8 @@ export default function ScanPage({
           {pendingCount > 0 && (
             <>
               <span className="text-slate-300">•</span>
-              <span className="px-2 py-0.5 rounded-full text-amber-700 bg-amber-50 border border-amber-200 font-semibold">
+              <span className="px-2 py-0.5 rounded-full text-amber-700 bg-amber-50 border border-amber-200 font-semibold inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
                 {pendingCount} pending sync
               </span>
             </>
@@ -286,8 +292,20 @@ export default function ScanPage({
               </p>
             </>
           )}
-          {(status.kind === "expired" || status.kind === "offline-queued") && (
+          {status.kind === "expired" && (
             <p className="text-sm font-semibold">{cfg.text}</p>
+          )}
+          {status.kind === "offline-queued" && (
+            <div>
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 text-amber-900 uppercase">
+                  ⏳ Pending (Offline)
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-amber-900">
+                Scan queued offline — will auto-sync when online
+              </p>
+            </div>
           )}
         </div>
       </div>
@@ -295,11 +313,20 @@ export default function ScanPage({
       {/* Offline sync section */}
       {(pendingCount > 0 || syncResults.length > 0) && (
         <div className="bg-white/90 backdrop-blur-xl border border-indigo-100/80 rounded-2xl p-5 mb-5 shadow-xs">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold text-slate-900">
-              Offline Queue
-            </h3>
-            {online && pendingCount > 0 && (
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold text-slate-900">
+                Offline Queue
+              </h3>
+              {!online && pendingCount > 0 && (
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                  Pending Sync ({pendingCount})
+                </span>
+              )}
+            </div>
+
+            {online && pendingCount > 0 ? (
               <button
                 id="sync-offline-btn"
                 onClick={handleSync}
@@ -315,18 +342,51 @@ export default function ScanPage({
                   `↑ Sync ${pendingCount} scan${pendingCount > 1 ? "s" : ""}`
                 )}
               </button>
-            )}
+            ) : !online && pendingCount > 0 ? (
+              <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200/80 px-2.5 py-1 rounded-lg flex items-center gap-1.5">
+                <span>⏳</span> Pending (Offline)
+              </span>
+            ) : null}
           </div>
 
+          {/* Pending items when offline */}
+          {!online && pendingList.length > 0 && (
+            <div className="mb-3 flex flex-col gap-2">
+              {pendingList.map((item, idx) => (
+                <div
+                  key={item.id ?? idx}
+                  className="p-3 rounded-xl border border-amber-200 bg-amber-50/50 text-xs flex items-center justify-between gap-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-amber-600 text-sm">⏳</span>
+                    <div>
+                      <div className="font-mono text-[11px] text-slate-700 font-medium">
+                        Token: {item.token.slice(0, 12)}...
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        Scanned at {new Date(item.scannedAt).toLocaleTimeString()}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300">
+                    Pending
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Sync results */}
           {syncResults.map((r, i) => (
             <div
               key={i}
-              className={`p-3 rounded-xl border text-xs mb-2 flex items-start gap-2 ${r.success
+              className={`p-3 rounded-xl border text-xs mb-2 flex items-start gap-2 ${
+                r.success
                   ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                   : r.conflict
                     ? "bg-amber-50 border-amber-200 text-amber-800"
                     : "bg-red-50 border-red-200 text-red-800"
-                }`}
+              }`}
             >
               <span>{r.success ? "✓" : r.conflict ? "⚡" : "✗"}</span>
               <div className="flex-1">

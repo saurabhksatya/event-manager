@@ -165,20 +165,20 @@ export default function OrganizerEventDashboard({
   return (
     <div className="max-w-6xl">
       {/* Header */}
-      <div className="flex items-start justify-between mb-8 gap-4 flex-wrap md:flex-nowrap">
-        <div className="min-w-0">
+      <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-8 gap-4">
+        <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-2">
             <Link
               href="/organizer/events"
-              className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+              className="text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors inline-flex items-center gap-1"
             >
               ← Events
             </Link>
           </div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-1.5 tracking-tight">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-1.5 tracking-tight break-words">
             {data?.event?.title ?? eventDetails?.title ?? "Loading..."}
           </h1>
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-3 py-1 rounded-full text-xs font-medium shrink-0">
               <span
                 className={`w-2 h-2 rounded-full animate-pulse ${connected ? "bg-emerald-500" : "bg-amber-500"}`}
@@ -188,9 +188,9 @@ export default function OrganizerEventDashboard({
 
             {eventDetails && (
               <>
-                <span className="text-slate-300">•</span>
+                <span className="text-slate-300 hidden sm:inline">•</span>
                 <span
-                  className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border shrink-0 whitespace-nowrap min-w-[105px] text-center inline-block ${
+                  className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border shrink-0 text-center inline-block ${
                     eventDetails.isActive
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200"
                       : "bg-slate-100 text-slate-600 border-slate-300"
@@ -202,7 +202,7 @@ export default function OrganizerEventDashboard({
                 </span>
 
                 <span
-                  className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border shrink-0 whitespace-nowrap min-w-[145px] text-center inline-block ${
+                  className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border shrink-0 text-center inline-block ${
                     eventDetails.isRegistrationOpen
                       ? "bg-indigo-50 text-indigo-700 border-indigo-200"
                       : "bg-amber-50 text-amber-700 border-amber-200"
@@ -217,14 +217,14 @@ export default function OrganizerEventDashboard({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2.5 items-center shrink-0">
+        <div className="flex flex-wrap gap-2 sm:gap-2.5 items-center w-full lg:w-auto pt-2 lg:pt-0">
           {eventDetails && (
             <>
               <button
                 type="button"
                 disabled={toggling}
                 onClick={toggleRegistration}
-                className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer whitespace-nowrap min-w-[145px] text-center inline-flex items-center justify-center ${
+                className={`flex-1 sm:flex-initial px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer text-center inline-flex items-center justify-center ${
                   eventDetails.isRegistrationOpen
                     ? "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
                     : "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200"
@@ -239,7 +239,7 @@ export default function OrganizerEventDashboard({
                 type="button"
                 disabled={toggling}
                 onClick={toggleActive}
-                className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer whitespace-nowrap min-w-[105px] text-center inline-flex items-center justify-center ${
+                className={`flex-1 sm:flex-initial px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer text-center inline-flex items-center justify-center ${
                   eventDetails.isActive
                     ? "bg-red-50 hover:bg-red-100 text-red-700 border-red-200"
                     : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
@@ -252,7 +252,7 @@ export default function OrganizerEventDashboard({
 
           <Link
             href={`/organizer/events/${eventId}/scan`}
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm transition-all shadow-sm shadow-emerald-600/30 flex items-center gap-2 whitespace-nowrap"
+            className="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs sm:text-sm transition-all shadow-sm shadow-emerald-600/30 flex items-center justify-center gap-2 whitespace-nowrap"
           >
             Open Scanner
           </Link>
@@ -260,7 +260,7 @@ export default function OrganizerEventDashboard({
             id="export-csv-btn"
             onClick={handleExport}
             disabled={exportLoading}
-            className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-xs disabled:opacity-50"
+            className="flex-1 sm:flex-initial px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs disabled:opacity-50 whitespace-nowrap"
           >
             {exportLoading ? (
               <span className="w-4 h-4 border-2 border-slate-400 border-t-slate-800 rounded-full animate-spin" />

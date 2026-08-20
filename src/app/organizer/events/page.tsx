@@ -217,7 +217,7 @@ export default function OrganizerEventsPage() {
 
   return (
     <div className="max-w-5xl">
-      <div className="flex items-start justify-between mb-8 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-8 gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
             Your Events
@@ -229,7 +229,7 @@ export default function OrganizerEventsPage() {
         </div>
         <button
           id="create-event-btn"
-          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all shadow-sm shadow-indigo-600/30 flex items-center gap-2 cursor-pointer shrink-0"
+          className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all shadow-sm shadow-indigo-600/30 flex items-center justify-center gap-2 cursor-pointer shrink-0"
           onClick={() => setShowCreate(true)}
         >
           + Create Event
@@ -241,7 +241,7 @@ export default function OrganizerEventsPage() {
           <span className="w-9 h-9 border-3 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
         </div>
       ) : events.length === 0 ? (
-        <div className="bg-white/80 backdrop-blur-xl border border-indigo-100/80 rounded-3xl p-16 text-center shadow-sm">
+        <div className="bg-white/80 backdrop-blur-xl border border-indigo-100/80 rounded-3xl p-8 sm:p-16 text-center shadow-sm">
           <div className="text-5xl mb-4">📅</div>
           <div className="text-lg font-bold text-slate-900 mb-2">
             No events yet
@@ -250,7 +250,7 @@ export default function OrganizerEventsPage() {
             Create your first event to get started.
           </div>
           <button
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all shadow-sm shadow-indigo-600/30 inline-flex items-center gap-2 cursor-pointer"
+            className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition-all shadow-sm shadow-indigo-600/30 inline-flex items-center justify-center gap-2 cursor-pointer"
             onClick={() => setShowCreate(true)}
           >
             Create Event
@@ -261,13 +261,13 @@ export default function OrganizerEventsPage() {
           {events.map((ev, i) => (
             <div
               key={ev.id}
-              className="bg-white/90 backdrop-blur-xl border border-indigo-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-all animate-fade-up"
+              className="bg-white/90 backdrop-blur-xl border border-indigo-100 rounded-3xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-all animate-fade-up overflow-hidden"
               style={{ animationDelay: `${i * 0.06}s` }}
             >
-              <div className="flex items-start justify-between gap-4 flex-wrap md:flex-nowrap">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2.5 mb-2 flex-wrap">
-                    <h2 className="text-lg font-bold text-slate-900">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <h2 className="text-lg font-bold text-slate-900 break-words">
                       {ev.title}
                     </h2>
 
@@ -277,7 +277,7 @@ export default function OrganizerEventsPage() {
                       disabled={updatingId === ev.id}
                       onClick={() => toggleActive(ev.id, ev.isActive)}
                       title="Click to toggle Event Active status"
-                      className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border transition-all cursor-pointer whitespace-nowrap min-w-[105px] text-center inline-block ${
+                      className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border transition-all cursor-pointer text-center inline-block ${
                         ev.isActive
                           ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
                           : "bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200"
@@ -294,7 +294,7 @@ export default function OrganizerEventsPage() {
                         toggleRegistration(ev.id, ev.isRegistrationOpen ?? true)
                       }
                       title="Click to toggle Registration status"
-                      className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border transition-all cursor-pointer whitespace-nowrap min-w-[145px] text-center inline-block ${
+                      className={`px-2.5 py-0.5 text-xs font-semibold rounded-full border transition-all cursor-pointer text-center inline-block ${
                         (ev.isRegistrationOpen ?? true)
                           ? "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100"
                           : "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
@@ -306,21 +306,21 @@ export default function OrganizerEventsPage() {
                     </button>
                   </div>
 
-                  <div className="flex flex-wrap gap-4 text-xs text-slate-500 mb-2">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
                     {ev.location && <span>📍 {ev.location}</span>}
                     <span>🗓 {new Date(ev.date).toLocaleString()}</span>
                     <span>👥 {ev.registeredCount} registered</span>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 shrink-0 items-center">
+                <div className="flex flex-wrap gap-2 items-center w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
                   <button
                     type="button"
                     disabled={updatingId === ev.id}
                     onClick={() =>
                       toggleRegistration(ev.id, ev.isRegistrationOpen ?? true)
                     }
-                    className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer whitespace-nowrap min-w-[145px] text-center inline-flex items-center justify-center ${
+                    className={`flex-1 sm:flex-initial px-3 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer text-center inline-flex items-center justify-center ${
                       (ev.isRegistrationOpen ?? true)
                         ? "bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200"
                         : "bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200"
@@ -335,7 +335,7 @@ export default function OrganizerEventsPage() {
                     type="button"
                     disabled={updatingId === ev.id}
                     onClick={() => toggleActive(ev.id, ev.isActive)}
-                    className={`px-3.5 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer whitespace-nowrap min-w-[105px] text-center inline-flex items-center justify-center ${
+                    className={`flex-1 sm:flex-initial px-3 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer text-center inline-flex items-center justify-center ${
                       ev.isActive
                         ? "bg-red-50 hover:bg-red-100 text-red-700 border-red-200"
                         : "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200"
@@ -346,13 +346,13 @@ export default function OrganizerEventsPage() {
 
                   <Link
                     href={`/organizer/events/${ev.id}/scan`}
-                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all shadow-sm shadow-emerald-600/30 inline-flex items-center gap-1.5"
+                    className="flex-1 sm:flex-initial px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all shadow-sm shadow-emerald-600/30 inline-flex items-center justify-center gap-1.5"
                   >
                     Scan
                   </Link>
                   <Link
                     href={`/organizer/events/${ev.id}`}
-                    className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all shadow-sm shadow-indigo-600/30 inline-flex items-center gap-1.5"
+                    className="flex-1 sm:flex-initial px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-all shadow-sm shadow-indigo-600/30 inline-flex items-center justify-center gap-1.5 whitespace-nowrap"
                   >
                     Dashboard →
                   </Link>

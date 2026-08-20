@@ -8,9 +8,9 @@ export default async function AttendeeLayout({ children }: { children: React.Rea
   if (!session) redirect("/");
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#f6f8fc]">
       <AttendeeSidebar user={session.user} />
-      <main className="flex-1 md:ml-60 p-6 md:p-8 min-h-screen">
+      <main className="flex-1 md:ml-60 p-4 sm:p-6 md:p-8 min-h-screen w-full max-w-full overflow-x-hidden">
         {children}
       </main>
     </div>
