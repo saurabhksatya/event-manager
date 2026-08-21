@@ -20,7 +20,7 @@ export async function GET() {
       return NextResponse.json(events);
     }
     const events = await prisma.event.findMany({
-      where: { isActive: false },
+      where: { isActive: true },
       orderBy: { date: "asc" },
       include: {
         organizer: { select: { id: true, name: true, email: true } },

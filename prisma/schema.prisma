@@ -118,7 +118,7 @@ model CheckIn {
   checkedInAt    DateTime @default(now()) @db.Timestamptz(3)
   stationId      String? // optional: identifies which scanner station
 
-  registration Registration @relation(fields: [registrationId], references: [id])
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
 
   @@map("check_in")
 }

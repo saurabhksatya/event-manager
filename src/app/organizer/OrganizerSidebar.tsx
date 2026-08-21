@@ -219,6 +219,21 @@ export default function OrganizerSidebar({ user }: Props) {
 
         <button
           onClick={() =>
+            fetch("/api/role", { method: "POST" }).then((res) => {
+              if (res.ok) {
+                router.push("/attendee/events");
+              } else {
+                console.error("Failed to change role");
+              }
+            })
+          }
+          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-blue-600 hover:bg-red-50 transition-all cursor-pointer border-none bg-transparent w-full text-left"
+        >
+          Change Role
+        </button>
+
+        <button
+          onClick={() =>
             signOut({
               fetchOptions: {
                 onSuccess: () => {
@@ -229,7 +244,6 @@ export default function OrganizerSidebar({ user }: Props) {
           }
           className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all cursor-pointer border-none bg-transparent w-full text-left"
         >
-          <span className="text-base">🚪</span>
           Sign Out
         </button>
       </aside>
