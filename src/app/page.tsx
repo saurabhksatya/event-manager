@@ -35,7 +35,10 @@ export default function Home() {
 
   async function handleGoogleSignIn() {
     setIsSigningIn(true);
-    await signIn.social({ provider: "google", callbackURL: "/dashboard" });
+    await signIn.social({
+      provider: "google",
+      callbackURL: "/attendee/events",
+    });
     setIsSigningIn(false);
   }
 
@@ -66,7 +69,11 @@ export default function Home() {
 
           <div className="mt-5 p-3 bg-indigo-50/80 border border-indigo-100 rounded-xl text-xs text-slate-500 flex items-start gap-2 text-left">
             <span>
-              Only <strong className="text-slate-700 font-semibold">@vitstudent.ac.in</strong> accounts are permitted.
+              Only{" "}
+              <strong className="text-slate-700 font-semibold">
+                @vitstudent.ac.in
+              </strong>{" "}
+              accounts are permitted.
             </span>
           </div>
         </div>

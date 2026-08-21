@@ -24,6 +24,11 @@ export default function AIInsights({ eventId }: AIInsightsProps) {
     setLoading(true);
     setError(null);
     setAnswer(null);
+    if (q.length > 1000) {
+      setError("Question is too long (max 1000 characters)");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch(`/api/events/${eventId}/insights`, {
@@ -97,7 +102,11 @@ export default function AIInsights({ eventId }: AIInsightsProps) {
           disabled={loading || !question.trim()}
           className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold rounded-xl text-sm transition-all shrink-0 cursor-pointer shadow-sm shadow-indigo-600/30 flex items-center justify-center"
         >
-          {loading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Ask"}
+          {loading ? (
+            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          ) : (
+            "Ask"
+          )}
         </button>
       </form>
 

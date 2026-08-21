@@ -14,18 +14,22 @@ import { queryEventInsights, type EventStats } from "@/lib/ai";
 
 export async function POST(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id: eventId } = await params;
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (session.user.role !== "admin") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const { question } = await req.json();
   if (!question?.trim()) {
-    return NextResponse.json({ error: "question is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "question is required" },
+      { status: 400 },
+    );
   }
 
   try {
@@ -34,7 +38,8 @@ export async function POST(
       where: { id: eventId },
       select: { title: true, date: true, registeredCount: true },
     });
-    if (!event) return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    if (!event)
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
 
     const checkIns = await prisma.checkIn.findMany({
       where: { registration: { eventId } },
@@ -44,7 +49,8 @@ export async function POST(
     const checkedIn = checkIns.length;
     const totalRegistered = event.registeredCount;
     const notCheckedIn = totalRegistered - checkedIn;
-    const noShowPct = totalRegistered > 0 ? (notCheckedIn / totalRegistered) * 100 : 0;
+    const noShowPct =
+      totalRegistered > 0 ? (notCheckedIn / totalRegistered) * 100 : 0;
 
     // Build check-ins by hour for peak analysis
     const byHour: Record<string, number> = {};
@@ -72,11 +78,21 @@ export async function POST(
       checkInsByHour,
     };
 
+    if ((question as string).length > 1000) {
+      return NextResponse.json(
+        { error: "Question is too long (max 1000 characters)" },
+        { status: 400 },
+      );
+    }
+
     const { answer, isAi } = await queryEventInsights(question, stats);
 
     return NextResponse.json({ answer, isAi, stats });
   } catch (err) {
     console.error("[insights]", err);
-    return NextResponse.json({ error: "Insights unavailable" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Insights unavailable" },
+      { status: 500 },
+    );
   }
 }

@@ -113,6 +113,26 @@ export default function OrganizerEventDashboard({
     if (!eventDetails || toggling) return;
     setToggling(true);
     try {
+      if (
+        eventDetails.isActive === true &&
+        eventDetails.isRegistrationOpen === true
+      ) {
+        const confirmClose = await fetch(`/api/events/${eventId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ isRegistrationOpen: false }),
+        });
+        if (!confirmClose.ok) {
+          alert("Failed to close registrations before disabling the event.");
+          setToggling(false);
+          return;
+        }
+        setEventDetails((prev) =>
+          prev
+            ? { ...prev, isRegistrationOpen: !prev.isRegistrationOpen }
+            : null,
+        );
+      }
       const res = await fetch(`/api/events/${eventId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -265,7 +285,7 @@ export default function OrganizerEventDashboard({
             {exportLoading ? (
               <span className="w-4 h-4 border-2 border-slate-400 border-t-slate-800 rounded-full animate-spin" />
             ) : (
-              "⬇ Export CSV"
+              "Export CSV"
             )}
           </button>
         </div>
@@ -278,25 +298,21 @@ export default function OrganizerEventDashboard({
             value: data ? checkedInCount : "—",
             label: "Checked In",
             color: "text-emerald-600",
-            badge: "SSE Stream",
           },
           {
             value: registeredCount,
             label: "Registered Attendees",
             color: "text-indigo-600",
-            badge: "Live Count",
           },
           {
             value: data ? `${checkInRate}%` : "—",
             label: "Check-in Rate",
             color: "text-blue-600",
-            badge: "Real-time %",
           },
           {
             value: peakHour ?? "—",
             label: "Peak Check-in Hour",
             color: "text-amber-600",
-            badge: "Analytics",
           },
         ].map((s, i) => (
           <div
@@ -306,9 +322,6 @@ export default function OrganizerEventDashboard({
           >
             <div className="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1 flex items-center justify-between">
               <span>{s.label}</span>
-              <span className="text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded">
-                {s.badge}
-              </span>
             </div>
             <div
               className={`text-3xl md:text-4xl font-extrabold tracking-tight ${s.color}`}

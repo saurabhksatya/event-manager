@@ -2,13 +2,25 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import { generateQrToken } from "@/lib/qr";
 
-// GET /api/events — list all active events
 export async function GET() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const admin = session.user.role === "admin";
   try {
+    if (admin) {
+      const events = await prisma.event.findMany({
+        orderBy: { date: "asc" },
+        include: {
+          organizer: { select: { id: true, name: true, email: true } },
+          _count: { select: { registrations: true } },
+        },
+      });
+      return NextResponse.json(events);
+    }
     const events = await prisma.event.findMany({
-      where: { isActive: true },
+      where: { isActive: false },
       orderBy: { date: "asc" },
       include: {
         organizer: { select: { id: true, name: true, email: true } },
@@ -18,16 +30,22 @@ export async function GET() {
     return NextResponse.json(events);
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch events" },
+      { status: 500 },
+    );
   }
 }
 
-// POST /api/events — create event (organizer/admin only)
 export async function POST(req: Request) {
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (session.user.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden — organizers only" }, { status: 403 });
+    return NextResponse.json(
+      { error: "Forbidden — organizers only" },
+      { status: 403 },
+    );
   }
 
   try {
@@ -35,7 +53,10 @@ export async function POST(req: Request) {
     const { title, description, date, location } = body;
 
     if (!title || !date) {
-      return NextResponse.json({ error: "title and date are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "title and date are required" },
+        { status: 400 },
+      );
     }
 
     const event = await prisma.event.create({
@@ -51,6 +72,9 @@ export async function POST(req: Request) {
     return NextResponse.json(event, { status: 201 });
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ error: "Failed to create event" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create event" },
+      { status: 500 },
+    );
   }
 }

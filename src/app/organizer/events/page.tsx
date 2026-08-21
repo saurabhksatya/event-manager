@@ -309,7 +309,6 @@ export default function OrganizerEventsPage() {
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 mb-2">
                     {ev.location && <span>📍 {ev.location}</span>}
                     <span>🗓 {new Date(ev.date).toLocaleString()}</span>
-                    <span>👥 {ev.registeredCount} registered</span>
                   </div>
                 </div>
 
@@ -334,7 +333,15 @@ export default function OrganizerEventsPage() {
                   <button
                     type="button"
                     disabled={updatingId === ev.id}
-                    onClick={() => toggleActive(ev.id, ev.isActive)}
+                    onClick={() => {
+                      if (
+                        ev.isActive === true &&
+                        ev.isRegistrationOpen === true
+                      ) {
+                        toggleRegistration(ev.id, true);
+                      }
+                      toggleActive(ev.id, ev.isActive);
+                    }}
                     className={`flex-1 sm:flex-initial px-3 py-2 text-xs font-semibold rounded-xl border transition-all cursor-pointer text-center inline-flex items-center justify-center ${
                       ev.isActive
                         ? "bg-red-50 hover:bg-red-100 text-red-700 border-red-200"

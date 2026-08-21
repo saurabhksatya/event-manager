@@ -37,7 +37,9 @@ export default function ScanPage({
 }) {
   const { id: eventId } = use(params);
   const [status, setStatus] = useState<ScanStatus>({ kind: "idle" });
-  const [online, setOnline] = useState(true);
+  const [online, setOnline] = useState(() =>
+    typeof navigator === "undefined" ? true : navigator.onLine,
+  );
   const [pendingCount, setPendingCount] = useState(0);
   const [pendingList, setPendingList] = useState<OfflineScan[]>([]);
   const [syncResults, setSyncResults] = useState<SyncResult[]>([]);
@@ -51,7 +53,6 @@ export default function ScanPage({
     const handleOffline = () => setOnline(false);
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
-    setOnline(navigator.onLine);
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
@@ -66,7 +67,10 @@ export default function ScanPage({
   }, [eventId]);
 
   useEffect(() => {
-    refreshPending();
+    const timeoutId = window.setTimeout(() => {
+      void refreshPending();
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, [refreshPending, status]);
 
   useEffect(() => {
@@ -109,14 +113,22 @@ export default function ScanPage({
       }
 
       if (!online) {
-        await enqueueOfflineScan({
-          token,
-          eventId,
-          stationId: STATION_ID,
-          scannedAt: new Date().toISOString(),
-        });
-        setStatus({ kind: "offline-queued" });
-        await refreshPending();
+        try {
+          await enqueueOfflineScan({
+            token,
+            eventId,
+            stationId: STATION_ID,
+            scannedAt: new Date().toISOString(),
+          });
+          setStatus({ kind: "offline-queued" });
+          await refreshPending();
+        } catch (error) {
+          setStatus({
+            kind: "error",
+            message:
+              error instanceof Error ? error.message : "Unable to queue scan",
+          });
+        }
         setTimeout(() => {
           setStatus({ kind: "idle" });
           setScanning(true);
@@ -149,14 +161,22 @@ export default function ScanPage({
           });
         }
       } catch {
-        await enqueueOfflineScan({
-          token,
-          eventId,
-          stationId: STATION_ID,
-          scannedAt: new Date().toISOString(),
-        });
-        setStatus({ kind: "offline-queued" });
-        await refreshPending();
+        try {
+          await enqueueOfflineScan({
+            token,
+            eventId,
+            stationId: STATION_ID,
+            scannedAt: new Date().toISOString(),
+          });
+          setStatus({ kind: "offline-queued" });
+          await refreshPending();
+        } catch (error) {
+          setStatus({
+            kind: "error",
+            message:
+              error instanceof Error ? error.message : "Unable to queue scan",
+          });
+        }
       }
 
       setTimeout(() => {
@@ -364,7 +384,8 @@ export default function ScanPage({
                         Token: {item.token.slice(0, 12)}...
                       </div>
                       <div className="text-[10px] text-slate-400">
-                        Scanned at {new Date(item.scannedAt).toLocaleTimeString()}
+                        Scanned at{" "}
+                        {new Date(item.scannedAt).toLocaleTimeString()}
                       </div>
                     </div>
                   </div>
